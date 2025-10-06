@@ -1,4 +1,5 @@
-
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
   provider = "postgresql"
@@ -30,29 +31,32 @@ model Draft {
   body        String
   imagePrompt String?
   images      String[]  @default([])
-  status      String    @default("pending")
+  status      String    @default("pending") // e.g., "pending", "approved", "posted"
   createdAt   DateTime  @default(now())
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  posts     Post[]
-  createdAt DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String?
+  linkedinId   String?  @unique
+  linkedinToken String?
+  posts        Post[]
+  createdAt    DateTime @default(now())
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  published Boolean  @default(false)
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
-  topicId   Int
-  topic     Topic    @relation(fields: [topicId], references: [id])
-  metrics   Metric?
-  createdAt DateTime @default(now())
+  id             Int      @id @default(autoincrement())
+  title          String
+  content        String
+  published      Boolean  @default(false)
+  authorId       Int
+  author         User     @relation(fields: [authorId], references: [id])
+  topicId        Int
+  topic          Topic    @relation(fields: [topicId], references: [id])
+  linkedinPostId String?  @unique
+  metrics        Metric?
+  createdAt      DateTime @default(now())
 }
 
 model Metric {
@@ -65,6 +69,7 @@ model Metric {
   updatedAt DateTime @updatedAt
 }
 
+// This model was missing, causing the error.
 model TopicLabel {
   id        Int      @id @default(autoincrement())
   label     String   @unique
