@@ -1,0 +1,73 @@
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Topic {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subreddit   String
+  score       Int
+  url         String
+  createdAt   DateTime @default(now())
+  source      String   @default("reddit")
+  drafts      Draft[]
+  posts       Post[]
+}
+
+model Draft {
+  id          Int       @id @default(autoincrement())
+  topicId     Int?
+  topic       Topic?    @relation(fields: [topicId], references: [id])
+  title       String
+  summary     String
+  body        String
+  imagePrompt String?
+  images      String[]  @default([])
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  posts     Post[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  published Boolean  @default(false)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  topicId   Int
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  metrics   Metric?
+  createdAt DateTime @default(now())
+}
+
+model Metric {
+  id        Int      @id @default(autoincrement())
+  postId    Int      @unique
+  post      Post     @relation(fields: [postId], references: [id])
+  views     Int      @default(0)
+  likes     Int      @default(0)
+  shares    Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+model TopicLabel {
+  id        Int      @id @default(autoincrement())
+  label     String   @unique
+  createdAt DateTime @default(now())
+}
+
